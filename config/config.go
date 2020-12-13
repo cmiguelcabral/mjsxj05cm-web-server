@@ -18,6 +18,10 @@ const hacksMetaConfigFilename = "config.json"
 
 const hacksMetaServicePath = "meta/service"
 
+func GetDirectoryPathForHack(hackID string) string {
+	return hacksRootPath + "/" + hackID
+}
+
 func GetMetaConfigDirectoryPathForHack(hackID string) string {
 	return hacksRootPath + "/" + hackID + "/" + hacksMetaConfigPath
 }

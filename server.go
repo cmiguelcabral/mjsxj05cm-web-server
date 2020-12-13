@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"os"
 
+	"./config"
+	"./customerror"
+	"./hack/rtspserver"
+	"./hack/sshserver"
+	"./hack/websocketstreamserver"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/telmomarques/x360h1080p-web-config-server/config"
-	"github.com/telmomarques/x360h1080p-web-config-server/customerror"
-	"github.com/telmomarques/x360h1080p-web-config-server/hack/rtspserver"
-	"github.com/telmomarques/x360h1080p-web-config-server/hack/sshserver"
-	"github.com/telmomarques/x360h1080p-web-config-server/hack/websocketstreamserver"
 )
 
 var wwwPath = "/mnt/sdcard/hacks/web-config/www"
@@ -36,6 +36,85 @@ func setupRouter() *gin.Engine {
 	apiHackRoutes := r.Group("/api/hack")
 
 	/**
+	 * Led Control
+	 */
+	ledcontrolHackRoutes := apiHackRoutes.Group("/" + ledcontrol.ID)
+
+	ledcontrolHackRoutes.GET("/state/:led", func(c *gin.Context) {
+		led := c.Param("led")
+		c.JSON(http.StatusOK, ledcontrol.GetLedStatus(led))
+	})
+
+	ledcontrolHackRoutes.POST("/state", func(c *gin.Context) {
+		var ledControl ledcontrol.LedStatus
+		var httpStatus = http.StatusOK
+		c.Bind(&ledControl)
+		success := ledcontrol.SetLed(ledControl)
+		if !success {
+			httpStatus = http.StatusInternalServerError
+		}
+		c.Status(httpStatus)
+
+	})
+
+	/**
+	 * Motor Control
+	 */
+	motorcontrolHackRoutes := apiHackRoutes.Group("/" + motorcontrol.ID)
+
+	motorcontrolHackRoutes.GET("/config", func(c *gin.Context) {
+		c.File(http.StatusOK, config.GetMetaConfigFilePathForHack(motorcontrol.ID))
+	})
+
+	motorcontrolHackRoutes.GET("/position", func(c *gin.Context) {
+		c.JSON(http.StatusOK, motorcontrol.getCurrentPosition())
+	})
+
+	motorcontrolHackRoutes.POST("/config", func(c *gin.Context) {
+		var motorcontrolConfig motorcontrol.MotorControlConfig
+		var httpStatus = http.StatusOK
+		c.Bind(&motorcontrolConfig)
+		success := motorcontrol.SaveConfig(motorcontrolConfig)
+		if !success {
+			httpStatus = http.StatusInternalServerError
+		}
+		c.Status(httpStatus)
+	})
+
+	motorcontrolHackRoutes.POST("/move", func(c *gin.Context) {
+		var motorControlMove motorcontrol.MotorControlMove
+		var httpStatus = http.StatusOK
+		c.Bind(&motorControlMove)
+		success := motorcontrol.miioMotorMove(motorControlMove)
+		if !success {
+			httpStatus = http.StatusInternalServerError
+		}
+		c.Status(httpStatus)
+	})
+
+	motorcontrolHackRoutes.POST("/goto", func(c *gin.Context) {
+		var motorControlPosition motorcontrol.MotorControlPosition
+		var httpStatus = http.StatusOK
+		c.Bind(&motorControlPosition)
+		success := motorcontrol.miioMotorGoto(motorControlPosition)
+		if !success {
+			httpStatus = http.StatusInternalServerError
+		}
+		c.Status(httpStatus)
+	})
+
+	motorcontrolHackRoutes.POST("/command", func(c *gin.Context) {
+		var motorControlCommand motorcontrol.MotorControlCommand
+		var httpStatus = http.StatusOK
+		c.Bind(&motorControlCommand)
+		success := motorcontrol.miioMotorGoto(motorControlCommand)
+		if !success {
+			httpStatus = http.StatusInternalServerError
+		}
+		c.Status(httpStatus)
+	})
+
+	/**
 	 * RTSP Server
 	 */
 	rtspServerHackRoutes := apiHackRoutes.Group("/" + rtspserver.ID)
@@ -46,6 +125,10 @@ func setupRouter() *gin.Engine {
 
 	rtspServerHackRoutes.GET("/info", func(c *gin.Context) {
 		c.String(http.StatusOK, rtspserver.Info())
+	})
+
+	rtspServerHackRoutes.GET("/status", func(c *gin.Context) {
+		c.JSON(http.StatusOK, rtspserver.GetServiceStatus())
 	})
 
 	rtspServerHackRoutes.POST("/config", func(c *gin.Context) {

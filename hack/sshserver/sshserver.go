@@ -1,10 +1,10 @@
 package sshserver
 
 import (
+	"../../config"
+	"../../customerror"
+	"../../service"
 	"github.com/kless/osutil/user/crypt/sha512_crypt"
-	"github.com/telmomarques/x360h1080p-web-config-server/config"
-	"github.com/telmomarques/x360h1080p-web-config-server/customerror"
-	"github.com/telmomarques/x360h1080p-web-config-server/service"
 )
 
 const ID = "ssh-server"
