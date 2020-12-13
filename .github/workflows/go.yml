@@ -30,13 +30,13 @@ jobs:
       run: go get -v -t -d ./...
 
     - name: Compile for ARM
-      run: GOOS=linux GOARCH=arm go build -v -o web-config-server .
+      run: make cross
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v1
       with:
         name: web-config-server
-        path: web-config-server
+        path: dist/web-config-server
 
     - name: Release (pre-release)
       if: env.isReleaseCandidate == 'true'
