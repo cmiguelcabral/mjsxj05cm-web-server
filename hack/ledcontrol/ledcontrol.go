@@ -35,9 +35,9 @@ var leds = map[string]Led{
 func SetLed(setLed LedStatus) bool {
 	var value []byte
 	if !setLed.Power {
-		value := []byte(strconv.Itoa(0))
+		value = []byte(strconv.Itoa(0))
 	} else {
-		value := []byte(strconv.Itoa(1))
+		value = []byte(strconv.Itoa(1))
 	}
 	err := ioutil.WriteFile(leds[setLed.Name].Pin, value, 0644)
 	if err != nil {
@@ -49,12 +49,14 @@ func SetLed(setLed LedStatus) bool {
 func GetLedStatus(getLed string) LedStatus {
 	var ledStatus LedStatus
 	ledStatus.Name = leds[getLed].Name
-	dat := ioutil.ReadFile(leds[getLed].Pin)
-	switch int(dat[0]) {
-	case 0:
-		ledStatus.Power = false
-	case 1:
-		ledStatus.Power = true
+	dat, err := ioutil.ReadFile(leds[getLed].Pin)
+	if err != nil {
+		switch int(dat[0]) {
+		case 0:
+			ledStatus.Power = false
+		case 1:
+			ledStatus.Power = true
+		}
 	}
 	return ledStatus
 }

@@ -7,6 +7,8 @@ import (
 
 	"./config"
 	"./customerror"
+	"./hack/ledcontrol"
+	"./hack/motorcontrol"
 	"./hack/rtspserver"
 	"./hack/sshserver"
 	"./hack/websocketstreamserver"
@@ -63,11 +65,11 @@ func setupRouter() *gin.Engine {
 	motorcontrolHackRoutes := apiHackRoutes.Group("/" + motorcontrol.ID)
 
 	motorcontrolHackRoutes.GET("/config", func(c *gin.Context) {
-		c.File(http.StatusOK, config.GetMetaConfigFilePathForHack(motorcontrol.ID))
+		c.File(config.GetMetaConfigFilePathForHack(motorcontrol.ID))
 	})
 
 	motorcontrolHackRoutes.GET("/position", func(c *gin.Context) {
-		c.JSON(http.StatusOK, motorcontrol.getCurrentPosition())
+		c.JSON(http.StatusOK, motorcontrol.GetCurrentPosition())
 	})
 
 	motorcontrolHackRoutes.POST("/config", func(c *gin.Context) {
@@ -85,7 +87,7 @@ func setupRouter() *gin.Engine {
 		var motorControlMove motorcontrol.MotorControlMove
 		var httpStatus = http.StatusOK
 		c.Bind(&motorControlMove)
-		success := motorcontrol.miioMotorMove(motorControlMove)
+		success := motorcontrol.MotorMove(motorControlMove)
 		if !success {
 			httpStatus = http.StatusInternalServerError
 		}
@@ -96,7 +98,7 @@ func setupRouter() *gin.Engine {
 		var motorControlPosition motorcontrol.MotorControlPosition
 		var httpStatus = http.StatusOK
 		c.Bind(&motorControlPosition)
-		success := motorcontrol.miioMotorGoto(motorControlPosition)
+		success := motorcontrol.MotorGoto(motorControlPosition)
 		if !success {
 			httpStatus = http.StatusInternalServerError
 		}
@@ -107,7 +109,7 @@ func setupRouter() *gin.Engine {
 		var motorControlCommand motorcontrol.MotorControlCommand
 		var httpStatus = http.StatusOK
 		c.Bind(&motorControlCommand)
-		success := motorcontrol.miioMotorGoto(motorControlCommand)
+		success := motorcontrol.Command(motorControlCommand)
 		if !success {
 			httpStatus = http.StatusInternalServerError
 		}

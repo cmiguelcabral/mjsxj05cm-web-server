@@ -1,6 +1,7 @@
 package motorcontrol
 
 import (
+	"bufio"
 	"bytes"
 	"io/ioutil"
 	"os"
@@ -70,7 +71,7 @@ func SaveConfig(newConfig MotorControlConfig) bool {
 	return true
 }
 
-func miioMotorMove(com MotorControlMove) bool {
+func MotorMove(com MotorControlMove) bool {
 	f, err := os.Create(motordFolder + "/" + eventFile)
 	if err != nil {
 		return false
@@ -87,7 +88,7 @@ func miioMotorMove(com MotorControlMove) bool {
 	return true
 }
 
-func miioMotorGoto(com MotorControlPosition) bool {
+func MotorGoto(com MotorControlPosition) bool {
 	f, err := os.Create(motordFolder + "/" + eventFile)
 	if err != nil {
 		return false
@@ -104,7 +105,7 @@ func miioMotorGoto(com MotorControlPosition) bool {
 	return true
 }
 
-func miioCommand(com MotorControlCommand) bool {
+func Command(com MotorControlCommand) bool {
 	f, err := os.Create(motordFolder + "/" + eventFile)
 	if err != nil {
 		return false
@@ -121,13 +122,17 @@ func miioCommand(com MotorControlCommand) bool {
 	return true
 }
 
-func getCurrentPosition() MotorControlPosition {
+func GetCurrentPosition() MotorControlPosition {
 	var currentPosition MotorControlPosition
 	dat, err := ioutil.ReadFile(motordFolder + "/" + positionFile)
-	pos = bytes.Split(dat, []byte{' '})
 	if err != nil {
-		currentPosition.PositionX = int(pos[0])
-		currentPosition.PositionY = int(pos[1])
+		dat := bytes.NewReader(dat)
+		pos := bufio.NewScanner(dat)
+		pos.Split(bufio.ScanWords)
+		pos.Scan()
+		currentPosition.PositionX, err = strconv.Atoi(pos.Text())
+		pos.Scan()
+		currentPosition.PositionY, err = strconv.Atoi(pos.Text())
 	}
 	return currentPosition
 }
