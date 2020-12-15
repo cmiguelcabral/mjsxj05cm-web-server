@@ -2,8 +2,7 @@ package motorcontrol
 
 import (
 	"bufio"
-	"bytes"
-	"io/ioutil"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -123,16 +122,20 @@ func Command(com MotorControlCommand) bool {
 }
 
 func GetCurrentPosition() MotorControlPosition {
+	fmt.Println("[MotorControlPosition]	Getting motor position.")
 	var currentPosition MotorControlPosition
-	dat, err := ioutil.ReadFile(motordFolder + "/" + positionFile)
+	file, err := os.Open(motordFolder + "/" + positionFile)
+	defer file.Close()
 	if err != nil {
-		dat := bytes.NewReader(dat)
-		pos := bufio.NewScanner(dat)
-		pos.Split(bufio.ScanWords)
-		pos.Scan()
-		currentPosition.PositionX, err = strconv.Atoi(pos.Text())
-		pos.Scan()
-		currentPosition.PositionY, err = strconv.Atoi(pos.Text())
+		fmt.Println("[MotorControlPosition]	Error reading getting motor position.")
+	} else {
+		scanner := bufio.NewScanner(file)
+		scanner.Split(bufio.ScanWords)
+		scanner.Scan()
+		currentPosition.PositionX, _ = strconv.Atoi(scanner.Text())
+		scanner.Scan()
+		currentPosition.PositionY, _ = strconv.Atoi(scanner.Text())
 	}
+	fmt.Println("[MotorControlPosition]	Response: %+v", currentPosition)
 	return currentPosition
 }

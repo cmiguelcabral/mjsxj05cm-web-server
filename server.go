@@ -42,21 +42,26 @@ func setupRouter() *gin.Engine {
 	 */
 	ledcontrolHackRoutes := apiHackRoutes.Group("/" + ledcontrol.ID)
 
-	ledcontrolHackRoutes.GET("/state/:led", func(c *gin.Context) {
-		led := c.Param("led")
+	ledcontrolHackRoutes.GET("/state", func(c *gin.Context) {
+		led := c.Query("led")
 		c.JSON(http.StatusOK, ledcontrol.GetLedStatus(led))
 	})
 
+	ledcontrolHackRoutes.GET("/blink", func(c *gin.Context) {
+		led := c.Query("led")
+		ledcontrol.BlinkLed(led)
+		c.String(http.StatusAccepted, "Success!")
+	})
+
 	ledcontrolHackRoutes.POST("/state", func(c *gin.Context) {
-		var ledControl ledcontrol.LedStatus
-		var httpStatus = http.StatusOK
-		c.Bind(&ledControl)
-		success := ledcontrol.SetLed(ledControl)
+		var led ledcontrol.Led
+		var httpStatus = http.StatusAccepted
+		c.Bind(&led)
+		success := ledcontrol.SetLed(led)
 		if !success {
 			httpStatus = http.StatusInternalServerError
 		}
-		c.Status(httpStatus)
-
+		c.String(httpStatus, "Success!")
 	})
 
 	/**
@@ -229,9 +234,9 @@ func setupRouter() *gin.Engine {
 		c.Status(httpStatus)
 	})
 
-	sshServerHackRoutes.DELETE("/config/users/:username", func(c *gin.Context) {
+	sshServerHackRoutes.DELETE("/config/users", func(c *gin.Context) {
 		var httpStatus = http.StatusOK
-		username := c.Param("username")
+		username := c.Query("username")
 
 		success := sshserver.DeleteUser(username)
 		if !success {
