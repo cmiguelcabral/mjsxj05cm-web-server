@@ -7,6 +7,7 @@ on:
     tags:
       - '*'
 env:
+  isNightly: ${{ contains(github.ref, 'dev') }}
   isReleaseCandidate: ${{ contains(github.ref, 'tags') && contains(github.ref, '-rc') }}
   isFinalRelease: ${{ contains(github.ref, 'tags') && !contains(github.ref, '-rc') }}
 
@@ -34,6 +35,18 @@ jobs:
       with:
         name: web-config-server
         path: dist/web-config-server
+
+    - name: Update latest-rc tag
+      if: env.isNightly == 'true'
+      uses: ncipollo/release-action@v1
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag : dev
+        commit : dev
+        allowUpdates: true
+        replacesArtifacts: true
+        prerelease: true
+        artifacts: web-config-server
 
     - name: Release (pre-release)
       if: env.isReleaseCandidate == 'true'
