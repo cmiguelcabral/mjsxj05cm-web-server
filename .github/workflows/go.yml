@@ -46,7 +46,7 @@ jobs:
         allowUpdates: true
         replacesArtifacts: true
         prerelease: true
-        artifacts: web-config-server
+        artifacts: dist/web-config-server
 
     # - name: Release (pre-release)
     #   if: env.isReleaseCandidate == 'true'
@@ -65,7 +65,7 @@ jobs:
         allowUpdates: true
         replacesArtifacts: true
         prerelease: true
-        artifacts: web-config-server
+        artifacts: dist/web-config-server
 
     # - name: Release (final)
     #   if: env.isFinalRelease == 'true'
@@ -82,4 +82,4 @@ jobs:
         tag: latest
         allowUpdates: true
         replacesArtifacts: true
-        artifacts: web-config-server
+        artifacts: dist/web-config-server
