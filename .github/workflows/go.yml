@@ -36,7 +36,7 @@ jobs:
         name: web-config-server
         path: dist/web-config-server
 
-    - name: Update latest-rc tag
+    - name: Update dev tag
       if: env.isNightly == 'true'
       uses: ncipollo/release-action@v1
       with:
