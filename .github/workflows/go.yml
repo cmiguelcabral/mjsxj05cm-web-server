@@ -44,6 +44,7 @@ jobs:
         name: dev
         prerelease: true
         replacesArtifacts: true
+        tag: dev
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: dist/web-config-server
 
