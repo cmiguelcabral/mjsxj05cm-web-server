@@ -40,7 +40,6 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         allowUpdates: true
-        draft: true
         name: dev
         prerelease: true
         replacesArtifacts: true
