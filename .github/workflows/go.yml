@@ -39,8 +39,9 @@ jobs:
       if: env.isNightly == 'true'
       uses: ncipollo/release-action@v1
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
         prerelease: true
+        tag : dev
+        token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: dist/web-config-server
 
     - name: Update dev tag
