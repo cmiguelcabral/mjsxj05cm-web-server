@@ -35,26 +35,17 @@ jobs:
         name: web-config-server
         path: dist/web-config-server
 
-    - name: Release (dev)
-      if: env.isNightly == 'true'
-      uses: ncipollo/release-action@v1
-      with:
-        prerelease: true
-        tag : dev
-        token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: dist/web-config-server
-
     - name: Update dev tag
       if: env.isNightly == 'true'
       uses: ncipollo/release-action@v1
       with:
         allowUpdates: true
-        artifacts: dist/web-config-server
-        commit: dev
+        draft: true
+        name: dev
         prerelease: true
         replacesArtifacts: true
-        tag : dev
         token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: dist/web-config-server
 
     # - name: Release (pre-release)
     #   if: env.isReleaseCandidate == 'true'
