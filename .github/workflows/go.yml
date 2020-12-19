@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - '*'
-    tags:
-      - '*'
 
 env:
   isNightly: ${{ contains(github.ref, 'dev') }}
@@ -60,7 +58,6 @@ jobs:
         asset_path: ./dist/web-config-server
         asset_name: web-config-server
         asset_content_type: application/zip
-      
 
     - name: Upload Release Asset
       if: env.isFinalRelease == 'true'
