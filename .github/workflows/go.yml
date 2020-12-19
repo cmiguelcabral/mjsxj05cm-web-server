@@ -35,6 +35,7 @@ jobs:
       with:
         tag_name: latest-rc
         release_name: latest-rc
+        commitish: dev
         prerelease: true
 
     - name: Create Release
@@ -46,7 +47,8 @@ jobs:
       with:
         tag_name: latest
         release_name: latest
-        prerelease: true
+        commitish: master
+        prerelease: false
 
     - name: Upload Release Asset
       if: env.isNightly == 'true'

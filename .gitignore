@@ -1,5 +1,7 @@
-web-config-server
-.vscode
 bin
 pkg
+
 dist
+test
+
+.vscode
