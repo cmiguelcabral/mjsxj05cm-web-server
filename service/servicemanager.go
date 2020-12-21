@@ -14,6 +14,10 @@ const (
 	Runit Supervisor = iota
 )
 
+type Service struct {
+	GetServiceStatus (ServiceStatus)
+}
+
 type ServiceStatus struct {
 	Name   string `json:"name"`
 	Status string `json:"status"`

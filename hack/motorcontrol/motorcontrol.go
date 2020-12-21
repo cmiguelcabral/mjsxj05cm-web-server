@@ -20,12 +20,20 @@ var eventFile = "event"
 var positionFile = "position"
 var statusFile = "status"
 
+type Motorcontrol struct {
+	*service.Service
+	SaveConfig         (bool)
+	Command            (bool)
+	GetCurrentPosition (MotorControlPosition)
+}
+
 type MotorControlConfig struct {
 	Enable bool `json:"enable"`
 }
 
 type MotorControlCommand struct {
-	Command string `json:"command"`
+	Command string      `json:"command"`
+	Args    interface{} `json:"args"`
 }
 
 type MotorControlMove struct {
@@ -45,6 +53,10 @@ func GetConfiguration() MotorControlConfig {
 	config.Load(ID, &currentConfig)
 
 	return currentConfig
+}
+
+func GetServiceStatus() service.ServiceStatus {
+	return service.Status(FriendlyName, service.Runit, serviceName)
 }
 
 func SaveConfig(newConfig MotorControlConfig) bool {
@@ -70,7 +82,23 @@ func SaveConfig(newConfig MotorControlConfig) bool {
 	return true
 }
 
-func MotorMove(com MotorControlMove) bool {
+func Command(com MotorControlCommand) bool {
+	switch com.Command {
+	case "move":
+		if args, ok := com.Args.(MotorControlMove); ok {
+			motorMove(args)
+			return true
+		}
+	case "goto":
+		if args, ok := com.Args.(MotorControlPosition); ok {
+			motorGoto(MotorControlPosition(args))
+			return true
+		}
+	}
+	return false
+}
+
+func motorMove(com MotorControlMove) bool {
 	f, err := os.Create(motordFolder + "/" + eventFile)
 	if err != nil {
 		return false
@@ -87,29 +115,12 @@ func MotorMove(com MotorControlMove) bool {
 	return true
 }
 
-func MotorGoto(com MotorControlPosition) bool {
+func motorGoto(com MotorControlPosition) bool {
 	f, err := os.Create(motordFolder + "/" + eventFile)
 	if err != nil {
 		return false
 	}
 	_, err = f.WriteString("goto " + strconv.Itoa(com.PositionX) + " " + strconv.Itoa(com.PositionY))
-	if err != nil {
-		f.Close()
-		return false
-	}
-	err = f.Close()
-	if err != nil {
-		return false
-	}
-	return true
-}
-
-func Command(com MotorControlCommand) bool {
-	f, err := os.Create(motordFolder + "/" + eventFile)
-	if err != nil {
-		return false
-	}
-	_, err = f.WriteString(com.Command)
 	if err != nil {
 		f.Close()
 		return false
@@ -136,6 +147,6 @@ func GetCurrentPosition() MotorControlPosition {
 		scanner.Scan()
 		currentPosition.PositionY, _ = strconv.Atoi(scanner.Text())
 	}
-	fmt.Println("[MotorControlPosition]	Response: %+v", currentPosition)
+	fmt.Println("[MotorControlPosition]	Response: ", currentPosition)
 	return currentPosition
 }

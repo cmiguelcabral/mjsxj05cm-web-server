@@ -53,7 +53,7 @@ func SetLed(setLed Led) bool {
 	return true
 }
 
-func BlinkLed(led string) {
+func BlinkLed(led string, count int) {
 	err := rpio.Open()
 	if err != nil {
 		os.Exit(1)
@@ -68,7 +68,7 @@ func BlinkLed(led string) {
 	// (source frequency divided by cycle length => 64000/32 = 2000)
 
 	// five times smoothly fade in and out
-	for i := 0; i < 5; i++ {
+	for i := 0; i < count; i++ {
 		for i := uint32(0); i < 32; i++ { // increasing brightness
 			pin.DutyCycle(i, 32)
 			time.Sleep(time.Second / 32)

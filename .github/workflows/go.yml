@@ -40,7 +40,7 @@ jobs:
       uses: marvinpinto/action-automatic-releases@latest
       if: env.isFinalRelease == 'true'
       with:
-        automatic_release_tag: latest-rc
+        automatic_release_tag: stable
         files: dist/web-config-server
         prerelease: false
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
